@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ツアー・予約 — SPACEPORT KII</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Page Loader -->
+  <div class="page-loader">
+    <div class="loader-rocket">🚀</div>
+  </div>
+
+  <!-- Section: Navigation -->
+  <nav class="nav-header scrolled">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="nav-logo">SPACEPORT KII</a>
+      <div class="nav-links flex items-center gap-8">
+        <a href="index.html">トップ</a>
+        <a href="tours.html" class="active">ツアー</a>
+        <a href="gourmet.html">グルメ</a>
+        <a href="map.html">マップ</a>
+        <a href="index.html#chatbot">AIチャット</a>
+      </div>
+      <button class="mobile-menu-btn" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu">
+    <a href="index.html">トップ</a>
+    <a href="tours.html">ツアー</a>
+    <a href="gourmet.html">グルメ</a>
+    <a href="map.html">マップ</a>
+    <a href="index.html#chatbot">AIチャット</a>
+  </div>
+
+  <!-- Section: Page Hero -->
+  <section class="page-hero">
+    <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920&q=80')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <span class="badge badge-orange mb-4 inline-block">TOURS & ACTIVITIES</span>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4" style="font-family: 'Inter', sans-serif;">
+        ロケット×海のアドベンチャー
+      </h1>
+      <p class="text-sub text-sm md:text-base">カヤック・漁船・射場見学。ここでしかできない体験。</p>
+    </div>
+  </section>
+
+  <!-- Section: Tour Cards -->
+  <section class="section">
+    <div class="text-center mb-12 reveal">
+      <div class="accent-line mx-auto"></div>
+      <h2 class="section-title">ツアー一覧</h2>
+      <p class="section-subtitle mx-auto">ロケット打上げをさまざまな角度から体験できるツアー</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 card-stagger">
+      <!-- Tour 1: Kayak -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1472745942893-4b9f730c7668?w=800&q=80"
+               alt="カヤックツアー" class="card-img h-56">
+          <span class="badge badge-orange absolute top-4 left-4">人気</span>
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🛶 カヤック</span>
+          <h3 class="font-bold text-lg mb-2">カヤックでロケットを見に行くツアー</h3>
+          <p class="text-sub text-sm mb-4">海上からロケット発射場を間近に望む、唯一無二のカヤック体験。串本の透明な海を漕ぎながら、宇宙への窓口に接近します。</p>
+          <div class="space-y-2 mb-6">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">提供: ビーチハウス・ラパン</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">所要時間: 約2時間</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">料金: お問い合わせ</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm w-full justify-center"
+                  data-modal="reservation"
+                  data-tour="カヤックでロケットを見に行くツアー">
+            リクエスト予約
+          </button>
+        </div>
+      </div>
+
+      <!-- Tour 2: Fishing Boat -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1545816250-e12bedba42ba?w=800&q=80"
+               alt="漁船チャーター" class="card-img h-56">
+          <span class="badge badge-blue absolute top-4 left-4">チャーター</span>
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-blue">🚢 クルーズ</span>
+          <h3 class="font-bold text-lg mb-2">漁船チャーターでロケット見学</h3>
+          <p class="text-sub text-sm mb-4">地元漁師の船をチャーターして、海上から打上げを観覧。グループ・家族でのプライベート見学に最適です。</p>
+          <div class="space-y-2 mb-6">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">提供: フィッシング＆クルーズはるまる</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">定員: 最大9名 / 約2時間</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">料金: お問い合わせ</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm w-full justify-center"
+                  data-modal="reservation"
+                  data-tour="漁船チャーターでロケット見学">
+            リクエスト予約
+          </button>
+        </div>
+      </div>
+
+      <!-- Tour 3: Launch Site -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1457364559154-aa2644600ebb?w=800&q=80"
+               alt="射場見学ツアー" class="card-img h-56">
+          <span class="badge badge-green absolute top-4 left-4">即時確定</span>
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🏗️ 見学</span>
+          <h3 class="font-bold text-lg mb-2">スペースポート紀伊 射場見学特別ツアー</h3>
+          <p class="text-sub text-sm mb-4">観光庁採択事業として実施される特別な射場見学。発射場の設備やロケット組立棟を間近で見学できます。</p>
+          <div class="space-y-2 mb-6">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">提供: USPジャパン（観光庁採択事業）</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">チケット即時確定</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-orange-400">▸</span>
+              <span class="text-sub">料金: 詳細はお問い合わせ</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm w-full justify-center"
+                  data-modal="reservation"
+                  data-tour="スペースポート紀伊 射場見学特別ツアー">
+            チケット購入
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Viewing Spots -->
+  <section class="section">
+    <div class="reveal">
+      <div class="accent-line"></div>
+      <h2 class="section-title mb-8">見学場情報</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="card reveal">
+        <div class="overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80"
+               alt="田原海水浴場" class="card-img h-48">
+        </div>
+        <div class="card-body">
+          <span class="badge badge-orange mb-3">公式見学場</span>
+          <h3 class="font-bold text-lg mb-2">田原海水浴場</h3>
+          <p class="text-sub text-sm mb-3">
+            スペースポート紀伊公式の見学場。打上げ当日は多くのファンが集まるベストビューポイント。
+            発射場から約3kmの距離で、迫力ある打上げを体感できます。
+          </p>
+          <div class="flex items-center gap-2 text-sm text-sub">
+            <span>📍</span>
+            <span>和歌山県東牟婁郡串本町田原</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=800&q=80"
+               alt="橋杭ロケット観覧場" class="card-img h-48">
+        </div>
+        <div class="card-body">
+          <span class="badge badge-blue mb-3">駐車場あり</span>
+          <h3 class="font-bold text-lg mb-2">橋杭ロケット観覧場駐車場</h3>
+          <p class="text-sub text-sm mb-3">
+            橋杭岩近くの観覧場。国の天然記念物「橋杭岩」とロケットの打上げを同時に楽しめる贅沢なスポット。
+            駐車場完備でアクセスも便利です。
+          </p>
+          <div class="flex items-center gap-2 text-sm text-sub">
+            <span>📍</span>
+            <span>和歌山県東牟婁郡串本町鬮野川</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Access Info -->
+    <div class="mt-12 reveal">
+      <div class="bg-[#111827] border border-white/10 rounded-2xl p-6">
+        <h3 class="font-bold mb-4 flex items-center gap-2">
+          <span class="text-xl">🚗</span> 交通アクセス
+        </h3>
+        <div class="grid sm:grid-cols-3 gap-4 text-sm">
+          <div>
+            <h4 class="text-orange-400 font-semibold mb-2">車</h4>
+            <p class="text-sub">大阪から約3時間30分<br>紀勢自動車道すさみ南IC下車</p>
+          </div>
+          <div>
+            <h4 class="text-orange-400 font-semibold mb-2">電車</h4>
+            <p class="text-sub">JR紀勢本線 串本駅下車<br>特急くろしおで新大阪から約3時間30分</p>
+          </div>
+          <div>
+            <h4 class="text-orange-400 font-semibold mb-2">飛行機</h4>
+            <p class="text-sub">南紀白浜空港から車で約1時間30分</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reservation Modal -->
+  <div class="modal-overlay">
+    <div class="modal relative">
+      <button class="modal-close" data-modal-close>×</button>
+
+      <!-- Form -->
+      <div class="modal-form">
+        <h2>🚀 リクエスト予約</h2>
+        <form id="reservation-form">
+          <input type="hidden" id="modal-tour-name">
+          <p class="text-sub text-sm mb-4" id="modal-tour-display"></p>
+          <div class="form-group">
+            <label>希望日</label>
+            <input type="date" required>
+          </div>
+          <div class="form-group">
+            <label>人数</label>
+            <select required>
+              <option value="">選択してください</option>
+              <option>1名</option>
+              <option>2名</option>
+              <option>3名</option>
+              <option>4名</option>
+              <option>5名以上</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>氏名</label>
+            <input type="text" placeholder="山田 太郎" required>
+          </div>
+          <div class="form-group">
+            <label>電話番号</label>
+            <input type="tel" placeholder="090-1234-5678" required>
+          </div>
+          <div class="form-group">
+            <label>メモ（任意）</label>
+            <textarea placeholder="ご要望があればご記入ください"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-full justify-center">リクエスト送信</button>
+        </form>
+      </div>
+
+      <!-- Success -->
+      <div class="modal-success-content" style="display:none;">
+        <div class="modal-success">
+          <div class="check-icon">✅</div>
+          <h3 class="text-xl font-bold mb-2">リクエストを受け付けました</h3>
+          <p class="text-sub text-sm mb-6">24時間以内にご連絡します。しばらくお待ちください。</p>
+          <button class="btn btn-secondary btn-sm" data-modal-close>閉じる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <h4>Spaceport Kii Portal</h4>
+        <p class="text-sub text-sm leading-relaxed">
+          本州最南端・和歌山県串本町から、<br>宇宙と観光を結ぶプラットフォーム。
+        </p>
+      </div>
+      <div>
+        <h4>コンテンツ</h4>
+        <a href="index.html">トップ</a>
+        <a href="tours.html">ツアー・予約</a>
+        <a href="gourmet.html">グルメ</a>
+        <a href="map.html">エリアマップ</a>
+        <a href="index.html#chatbot">AIコンシェルジュ</a>
+      </div>
+      <div>
+        <h4>関連リンク</h4>
+        <a href="#">串本町観光協会</a>
+        <a href="#">スペースワン</a>
+        <a href="#">USPジャパン</a>
+      </div>
+      <div>
+        <h4>SNS</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="X">𝕏</a>
+          <a href="#" aria-label="YouTube">▶</a>
+        </div>
+        <div class="mt-4">
+          <h4 class="mt-4">言語</h4>
+          <div class="footer-lang">
+            <button class="active">JP</button>
+            <button>EN</button>
+            <button>中簡</button>
+            <button>中繁</button>
+            <button>韓</button>
+            <button>TH</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Spaceport Kii Portal. Powered by More than Six</span>
+      <span class="text-xs">プロトタイプ版 — 機能デモ用</span>
+    </div>
+  </footer>
+
+  <!-- Chatbot Widget -->
+  <button class="chatbot-toggle" aria-label="AIチャットを開く">🚀</button>
+  <div class="chatbot-panel">
+    <div class="chatbot-header">
+      <h3>🚀 ロケット観光AIコンシェルジュ</h3>
+      <div class="lang-switcher">
+        <button class="lang-btn active">JP</button>
+        <button class="lang-btn">EN</button>
+        <button class="lang-btn">中</button>
+        <button class="lang-btn">韓</button>
+        <button class="lang-btn">TH</button>
+      </div>
+    </div>
+    <div class="chatbot-quick-actions">
+      <button class="quick-btn">打上げスケジュール</button>
+      <button class="quick-btn">おすすめグルメ</button>
+      <button class="quick-btn">アクセス</button>
+      <button class="quick-btn">博物館情報</button>
+    </div>
+    <div class="chatbot-messages">
+      <div class="chat-msg user">家族4人で1泊2日、ロケット見たいです</div>
+      <div class="chat-msg ai">
+        おすすめモデルコースをご提案します！
+        <span class="emoji-line">🌅 <strong>1日目:</strong> Sora-Miru見学 → サンドリアでロケットカレー → カヤックツアー</span>
+        <span class="emoji-line">🌙 <strong>夜:</strong> Camp Resort Ohshima泊</span>
+        <span class="emoji-line">🚀 <strong>2日目:</strong> 田原海水浴場で打上げ見学 → 橋杭岩 → お土産購入</span>
+      </div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" placeholder="質問を入力...">
+      <button>▶</button>
+    </div>
+  </div>
+
+  <!-- Tour name display in modal -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-modal="reservation"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tourName = btn.dataset.tour || '';
+          const display = document.getElementById('modal-tour-display');
+          if (display) display.textContent = '対象ツアー: ' + tourName;
+        });
+      });
+    });
+  </script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

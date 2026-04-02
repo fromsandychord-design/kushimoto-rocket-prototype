@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPACEPORT KII — ロケット観光ポータル</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Page Loader -->
+  <div class="page-loader">
+    <div class="loader-rocket">🚀</div>
+  </div>
+
+  <!-- Section: Navigation -->
+  <nav class="nav-header">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="nav-logo">SPACEPORT KII</a>
+      <div class="nav-links flex items-center gap-8">
+        <a href="index.html" class="active">トップ</a>
+        <a href="tours.html">ツアー</a>
+        <a href="gourmet.html">グルメ</a>
+        <a href="map.html">マップ</a>
+        <a href="#chatbot" class="chatbot-nav-link">AIチャット</a>
+      </div>
+      <button class="mobile-menu-btn" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu">
+    <a href="index.html">トップ</a>
+    <a href="tours.html">ツアー</a>
+    <a href="gourmet.html">グルメ</a>
+    <a href="map.html">マップ</a>
+    <a href="#chatbot">AIチャット</a>
+  </div>
+
+  <!-- Section: Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=1920&q=80')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <div class="countdown glow-orange" id="countdown">
+        <span class="num">3...</span>
+        <span class="num">2...</span>
+        <span class="num">1...</span>
+        <span class="num">LAUNCH</span>
+      </div>
+      <h1 class="text-2xl md:text-4xl font-bold mb-3 tracking-wide" style="font-family: 'Noto Sans JP', sans-serif;">
+        スペースポート紀伊 ロケット観光ポータル
+      </h1>
+      <p class="text-sm md:text-base tracking-widest text-gray-400 mb-10" style="font-family: 'Inter', sans-serif;">
+        SPACEPORT KII — Kushimoto, Wakayama
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#schedule" class="btn btn-primary">打上げスケジュール</a>
+        <a href="tours.html" class="btn btn-secondary">ツアーを予約する</a>
+      </div>
+    </div>
+    <div class="scroll-chevron">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Section: About KAIROS -->
+  <section class="section" id="about">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="reveal">
+        <img src="https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=800&q=80"
+             alt="カイロスロケット"
+             class="rounded-2xl w-full h-80 object-cover border border-white/5 shadow-2xl">
+      </div>
+      <div class="reveal">
+        <div class="accent-line"></div>
+        <h2 class="section-title">カイロスロケットとは</h2>
+        <p class="text-sub text-sm mb-4">日本初の民間小型ロケット発射場</p>
+        <p class="text-gray-300 mb-6 leading-relaxed">
+          和歌山県串本町。本州最南端から宇宙へ。<br>
+          スペースワン株式会社が開発する小型固体燃料ロケット「カイロス」は、
+          ここスペースポート紀伊から打ち上げられます。
+        </p>
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>号機</th>
+              <th>打上げ日</th>
+              <th>結果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>初号機</td>
+              <td>2024年3月13日</td>
+              <td class="text-orange-400">飛行中断</td>
+            </tr>
+            <tr>
+              <td>2号機</td>
+              <td>2024年12月18日</td>
+              <td class="text-orange-400">飛行中断</td>
+            </tr>
+            <tr>
+              <td>3号機</td>
+              <td>2025年12月14日</td>
+              <td class="text-green-400 font-semibold">成功 🎉</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Features (4 Cards) -->
+  <section class="section">
+    <div class="text-center mb-12 reveal">
+      <div class="accent-line mx-auto"></div>
+      <h2 class="section-title">体験できること</h2>
+      <p class="section-subtitle mx-auto">ロケット打上げだけじゃない。串本で待っている特別な体験。</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 card-stagger">
+      <!-- Card 1: Tours -->
+      <a href="tours.html" class="card group">
+        <div class="overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80"
+               alt="ツアー＆アクティビティ" class="card-img">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🚀 ツアー</span>
+          <h3 class="font-bold mb-2">ツアー＆アクティビティ</h3>
+          <p class="text-sub text-sm mb-3">カヤック・漁船チャーター・射場見学で、ロケットを間近に体感。</p>
+          <span class="text-orange-400 text-sm font-semibold group-hover:translate-x-1 inline-block transition-transform">詳しく見る →</span>
+        </div>
+      </a>
+      <!-- Card 2: Gourmet -->
+      <a href="gourmet.html" class="card group">
+        <div class="overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&q=80"
+               alt="ロケットグルメ" class="card-img">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🍛 グルメ</span>
+          <h3 class="font-bold mb-2">ロケットグルメ</h3>
+          <p class="text-sub text-sm mb-3">サンドリアのロケットカレー、ロケットドッグ、高校生ラーメン。</p>
+          <span class="text-orange-400 text-sm font-semibold group-hover:translate-x-1 inline-block transition-transform">詳しく見る →</span>
+        </div>
+      </a>
+      <!-- Card 3: Map -->
+      <a href="map.html" class="card group">
+        <div class="overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=600&q=80"
+               alt="エリアマップ" class="card-img">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-blue">🗺️ マップ</span>
+          <h3 class="font-bold mb-2">エリアマップ</h3>
+          <p class="text-sub text-sm mb-3">発射場・見学場・グルメ・宿泊をインタラクティブマップで一覧。</p>
+          <span class="text-orange-400 text-sm font-semibold group-hover:translate-x-1 inline-block transition-transform">詳しく見る →</span>
+        </div>
+      </a>
+      <!-- Card 4: AI Concierge -->
+      <a href="#chatbot" class="card group">
+        <div class="overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80"
+               alt="AIコンシェルジュ" class="card-img">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-blue">🤖 AI</span>
+          <h3 class="font-bold mb-2">AIコンシェルジュ</h3>
+          <p class="text-sub text-sm mb-3">6言語対応のAIが旅マエ・ナカ・アトをサポート。</p>
+          <span class="text-orange-400 text-sm font-semibold group-hover:translate-x-1 inline-block transition-transform">詳しく見る →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section: AI Concierge Demo -->
+  <section class="section" id="chatbot">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="reveal">
+        <div class="accent-line"></div>
+        <h2 class="section-title">AIコンシェルジュ</h2>
+        <p class="text-sub mb-4">旅マエ・ナカ・アトの全フェーズで観光客をサポート</p>
+        <ul class="space-y-3 text-gray-300 text-sm">
+          <li class="flex items-start gap-3">
+            <span class="text-orange-400 mt-0.5">▸</span>
+            <span><strong>旅マエ</strong>：モデルコース提案、宿・交通の情報提供、打上げスケジュール通知</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-orange-400 mt-0.5">▸</span>
+            <span><strong>旅ナカ</strong>：リアルタイム案内、多言語対応、周辺スポット検索</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-orange-400 mt-0.5">▸</span>
+            <span><strong>旅アト</strong>：お土産EC、ふるさと納税案内、次回打上げ通知</span>
+          </li>
+        </ul>
+        <div class="flex flex-wrap gap-2 mt-6">
+          <span class="badge badge-orange">日本語</span>
+          <span class="badge badge-blue">English</span>
+          <span class="badge badge-green">中文</span>
+          <span class="badge" style="background:#8b5cf6;color:white;">한국어</span>
+          <span class="badge" style="background:#ec4899;color:white;">ภาษาไทย</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <!-- Embedded Chat Demo -->
+        <div class="bg-[#111827] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+          <div class="p-4 bg-orange-500/10 border-b border-white/10 flex items-center gap-2">
+            <span class="text-xl">🚀</span>
+            <span class="font-bold text-sm">ロケット観光AIコンシェルジュ</span>
+            <div class="ml-auto flex gap-1">
+              <span class="lang-btn active" style="font-size:0.6rem;padding:2px 6px;">JP</span>
+              <span class="lang-btn" style="font-size:0.6rem;padding:2px 6px;">EN</span>
+              <span class="lang-btn" style="font-size:0.6rem;padding:2px 6px;">中</span>
+              <span class="lang-btn" style="font-size:0.6rem;padding:2px 6px;">韓</span>
+              <span class="lang-btn" style="font-size:0.6rem;padding:2px 6px;">TH</span>
+            </div>
+          </div>
+          <div class="p-4 flex flex-wrap gap-2 border-b border-white/10">
+            <button class="quick-btn">打上げスケジュール</button>
+            <button class="quick-btn">おすすめグルメ</button>
+            <button class="quick-btn">アクセス</button>
+            <button class="quick-btn">博物館情報</button>
+          </div>
+          <div class="p-4 space-y-3" style="min-height: 200px;">
+            <div class="chat-msg user">家族4人で1泊2日、ロケット見たいです</div>
+            <div class="chat-msg ai">
+              おすすめモデルコースをご提案します！
+              <span class="emoji-line">🌅 <strong>1日目:</strong> Sora-Miru見学 → サンドリアでロケットカレー → カヤックツアー</span>
+              <span class="emoji-line">🌙 <strong>夜:</strong> Camp Resort Ohshima泊</span>
+              <span class="emoji-line">🚀 <strong>2日目:</strong> 田原海水浴場で打上げ見学 → 橋杭岩 → お土産購入</span>
+            </div>
+          </div>
+          <div class="p-3 border-t border-white/10 flex gap-2">
+            <input type="text" placeholder="質問を入力..." class="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white outline-none" disabled>
+            <button class="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white text-sm shrink-0">▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Sora-Miru & Schedule -->
+  <section class="section" id="schedule">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="reveal">
+        <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80"
+             alt="宇宙ふれあいホールSora-Miru"
+             class="rounded-2xl w-full h-80 object-cover border border-white/5 shadow-2xl">
+      </div>
+      <div class="reveal">
+        <div class="accent-line"></div>
+        <h2 class="section-title">宇宙ふれあいホール<br><span class="text-blue">Sora-Miru</span></h2>
+        <p class="text-gray-300 mb-6 leading-relaxed">
+          串本町にある宇宙関連の展示施設。ロケットの仕組みや宇宙開発の歴史を学べる体験型ミュージアムです。
+          射場見学ツアーの拠点としても利用されています。
+        </p>
+        <div class="bg-[#111827] border border-white/10 rounded-2xl p-6 mb-4">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-2xl">🚀</span>
+            <div>
+              <h3 class="font-bold text-sm">次回打上げ: カイロス4号機</h3>
+              <p class="text-sub text-xs">日程未発表 — 発表され次第更新</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge badge-orange">UPCOMING</span>
+            <span class="text-xs text-sub">詳細が発表され次第、通知をお届けします</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="alert('通知機能は本番版で実装予定です')">
+          🔔 通知を受け取る
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: KiiPAY Digital Voucher -->
+  <section class="section">
+    <div class="reveal">
+      <div class="kiipay-card">
+        <div>
+          <div class="accent-line"></div>
+          <h2 class="section-title">きいPAY<span class="text-blue">デジタル商品券</span></h2>
+          <p class="text-gray-300 mb-4 leading-relaxed">
+            串本エリアで使えるデジタル商品券。飲食店、お土産店、宿泊施設など
+            <strong class="text-orange-400">34加盟店</strong>で利用可能。
+          </p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="badge badge-orange">34加盟店</span>
+            <span class="badge badge-blue">QRコード決済</span>
+            <span class="badge badge-green">ロケット打上げ記念キャンペーン</span>
+          </div>
+          <p class="text-sub text-sm">
+            ロケット打上げ時期には特別キャンペーンを実施。串本のお店をお得に楽しめます。
+          </p>
+        </div>
+        <div class="qr-mock">
+          <span>きいPAY<br>QRコード</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <h4>Spaceport Kii Portal</h4>
+        <p class="text-sub text-sm leading-relaxed">
+          本州最南端・和歌山県串本町から、<br>宇宙と観光を結ぶプラットフォーム。
+        </p>
+      </div>
+      <div>
+        <h4>コンテンツ</h4>
+        <a href="index.html">トップ</a>
+        <a href="tours.html">ツアー・予約</a>
+        <a href="gourmet.html">グルメ</a>
+        <a href="map.html">エリアマップ</a>
+        <a href="#chatbot">AIコンシェルジュ</a>
+      </div>
+      <div>
+        <h4>関連リンク</h4>
+        <a href="#">串本町観光協会</a>
+        <a href="#">スペースワン</a>
+        <a href="#">USPジャパン</a>
+      </div>
+      <div>
+        <h4>SNS</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="X">𝕏</a>
+          <a href="#" aria-label="YouTube">▶</a>
+        </div>
+        <div class="mt-4">
+          <h4 class="mt-4">言語</h4>
+          <div class="footer-lang">
+            <button class="active">JP</button>
+            <button>EN</button>
+            <button>中簡</button>
+            <button>中繁</button>
+            <button>韓</button>
+            <button>TH</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Spaceport Kii Portal. Powered by More than Six</span>
+      <span class="text-xs">プロトタイプ版 — 機能デモ用</span>
+    </div>
+  </footer>
+
+  <!-- Chatbot Widget (Global) -->
+  <button class="chatbot-toggle" aria-label="AIチャットを開く">🚀</button>
+  <div class="chatbot-panel">
+    <div class="chatbot-header">
+      <h3>🚀 ロケット観光AIコンシェルジュ</h3>
+      <div class="lang-switcher">
+        <button class="lang-btn active">JP</button>
+        <button class="lang-btn">EN</button>
+        <button class="lang-btn">中</button>
+        <button class="lang-btn">韓</button>
+        <button class="lang-btn">TH</button>
+      </div>
+    </div>
+    <div class="chatbot-quick-actions">
+      <button class="quick-btn">打上げスケジュール</button>
+      <button class="quick-btn">おすすめグルメ</button>
+      <button class="quick-btn">アクセス</button>
+      <button class="quick-btn">博物館情報</button>
+    </div>
+    <div class="chatbot-messages">
+      <div class="chat-msg user">家族4人で1泊2日、ロケット見たいです</div>
+      <div class="chat-msg ai">
+        おすすめモデルコースをご提案します！
+        <span class="emoji-line">🌅 <strong>1日目:</strong> Sora-Miru見学 → サンドリアでロケットカレー → カヤックツアー</span>
+        <span class="emoji-line">🌙 <strong>夜:</strong> Camp Resort Ohshima泊</span>
+        <span class="emoji-line">🚀 <strong>2日目:</strong> 田原海水浴場で打上げ見学 → 橋杭岩 → お土産購入</span>
+      </div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" placeholder="質問を入力...">
+      <button>▶</button>
+    </div>
+  </div>
+
+  <!-- Custom JS -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

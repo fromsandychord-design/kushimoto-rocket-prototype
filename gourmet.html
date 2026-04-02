@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>グルメ — SPACEPORT KII</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Page Loader -->
+  <div class="page-loader">
+    <div class="loader-rocket">🚀</div>
+  </div>
+
+  <!-- Section: Navigation -->
+  <nav class="nav-header scrolled">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="nav-logo">SPACEPORT KII</a>
+      <div class="nav-links flex items-center gap-8">
+        <a href="index.html">トップ</a>
+        <a href="tours.html">ツアー</a>
+        <a href="gourmet.html" class="active">グルメ</a>
+        <a href="map.html">マップ</a>
+        <a href="index.html#chatbot">AIチャット</a>
+      </div>
+      <button class="mobile-menu-btn" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu">
+    <a href="index.html">トップ</a>
+    <a href="tours.html">ツアー</a>
+    <a href="gourmet.html">グルメ</a>
+    <a href="map.html">マップ</a>
+    <a href="index.html#chatbot">AIチャット</a>
+  </div>
+
+  <!-- Section: Page Hero -->
+  <section class="page-hero">
+    <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=1920&q=80')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <span class="badge badge-orange mb-4 inline-block">ROCKET GOURMET</span>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4" style="font-family: 'Inter', sans-serif;">
+        ロケットグルメ
+      </h1>
+      <p class="text-sub text-sm md:text-base">宇宙から着想した串本の味</p>
+    </div>
+  </section>
+
+  <!-- Section: Gourmet Cards -->
+  <section class="section">
+    <div class="text-center mb-12 reveal">
+      <div class="accent-line mx-auto"></div>
+      <h2 class="section-title">ロケットグルメ一覧</h2>
+      <p class="section-subtitle mx-auto">ロケットにちなんだ、ここでしか味わえない特別メニュー</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 card-stagger">
+      <!-- Gourmet 1: Sandria Rocket Curry -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80"
+               alt="ロケットカレー" class="card-img h-56">
+          <span class="badge badge-orange absolute top-4 left-4">1日15食限定</span>
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🍛 カレー</span>
+          <h3 class="font-bold text-lg mb-1">サンドリアのロケットカレー</h3>
+          <p class="text-xs text-sub mb-3">串シーフードロケットフライカレー</p>
+          <p class="text-sub text-sm mb-4">高さ35cmのロケット型フライが聳え立つ名物カレー。串本の海鮮をふんだんに使った逸品。</p>
+          <div class="flex items-center justify-between">
+            <span class="text-orange-400 font-bold text-lg">¥1,600</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">予約不要・先着順</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gourmet 2: Rocket Dog -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80"
+               alt="ロケットドッグ" class="card-img h-56">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🌭 ホットドッグ</span>
+          <h3 class="font-bold text-lg mb-1">潮岬観光タワー ロケットドッグ</h3>
+          <p class="text-sub text-sm mb-4">本州最南端・潮岬観光タワーで販売されるロケットをモチーフにしたホットドッグ。展望台からの絶景と一緒にどうぞ。</p>
+          <div class="flex items-center justify-between">
+            <span class="text-orange-400 font-bold text-lg">お問い合わせ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gourmet 3: Anago Rocket Don -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80"
+               alt="あなごロケット丼" class="card-img h-56">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-blue">🍚 丼</span>
+          <h3 class="font-bold text-lg mb-1">あなごロケット丼</h3>
+          <p class="text-sub text-sm mb-4">串本名物のあなごをロケットの形に盛り付けた丼。地元の新鮮な穴子の甘みが堪能できます。</p>
+          <div class="flex items-center justify-between">
+            <span class="text-orange-400 font-bold text-lg">¥1,000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gourmet 4: Spice Curry ROCKET -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&q=80"
+               alt="Spice Curry ROCKET" class="card-img h-56">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🌶️ スパイスカレー</span>
+          <h3 class="font-bold text-lg mb-1">Spice Curry ROCKET</h3>
+          <p class="text-xs text-sub mb-3">串本町大島114</p>
+          <p class="text-sub text-sm mb-4">串本大島にあるスパイスカレー専門店。本格スパイスと地元食材の融合が生み出す、宇宙的な味わい。</p>
+          <div class="flex items-center justify-between">
+            <span class="text-orange-400 font-bold text-lg">お問い合わせ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gourmet 5: Rocket Unadon -->
+      <div class="card">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1530648672449-81f6c723e2f1?w=800&q=80"
+               alt="ロケットうな丼" class="card-img h-56">
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-blue">🍚 丼</span>
+          <h3 class="font-bold text-lg mb-1">ロケットうな丼</h3>
+          <p class="text-sub text-sm mb-4">ふっくら焼き上げた鰻をロケットの形に配した特製うな丼。タレの香ばしさが食欲をそそります。</p>
+          <div class="flex items-center justify-between">
+            <span class="text-orange-400 font-bold text-lg">お問い合わせ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gourmet 6: Rocket Ramen ⭐ -->
+      <div class="card" id="ramen">
+        <div class="overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800&q=80"
+               alt="高校生ロケットラーメン" class="card-img h-56">
+          <span class="badge badge-green absolute top-4 left-4">⭐ ストーリーあり</span>
+        </div>
+        <div class="card-body">
+          <span class="card-tag tag-orange">🍜 ラーメン</span>
+          <h3 class="font-bold text-lg mb-1">高校生ロケットラーメン</h3>
+          <p class="text-xs text-sub mb-3">トビウオ出汁 + ジビエ</p>
+          <p class="text-sub text-sm mb-4">串本古座高校CGS部の高校生が開発した、地元素材を活かしたオリジナルラーメン。</p>
+          <div class="flex items-center justify-between">
+            <span class="text-orange-400 font-bold text-lg">イベント限定</span>
+            <a href="#story" class="text-blue-400 text-sm font-semibold hover:text-blue-300 transition-colors">ストーリーを読む →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Story -->
+  <section class="section" id="story">
+    <div class="story-section reveal">
+      <div class="accent-line"></div>
+      <h2 class="section-title mb-6">高校生が作ったロケットラーメン<br><span class="text-sub text-base font-normal">トビウオ出汁×ジビエの挑戦</span></h2>
+      <div class="space-y-4 text-gray-300 leading-relaxed">
+        <p>
+          串本古座高校CGS（Community Global Studies）部のロケット班。ロケット打上げで盛り上がる地元を、
+          「食」でも応援したいという想いから、オリジナルラーメンの開発プロジェクトが始まりました。
+        </p>
+        <p>
+          スープのベースには、串本の海で獲れるトビウオ（アゴ）の出汁を採用。上品で深い旨みが特徴です。
+          トッピングには、紀伊半島の山の恵み・ジビエ（鹿肉）をチャーシューとして使用。
+          海と山、両方の串本をひとつの丼に詰め込みました。
+        </p>
+        <p>
+          地元イベントで提供されるたびに即完売する人気ぶり。高校生たちの「地元愛×宇宙への夢」が
+          形になったこのラーメンは、串本を訪れる人々の心にも深く残る一杯となっています。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Rocket Goods & EC -->
+  <section class="section">
+    <div class="reveal">
+      <div class="accent-line"></div>
+      <h2 class="section-title mb-2">ロケットグッズ</h2>
+      <p class="section-subtitle">66種類のロケットグッズから厳選ピックアップ</p>
+    </div>
+
+    <div class="flex flex-wrap gap-3 mb-8 reveal">
+      <span class="badge badge-orange">菓子</span>
+      <span class="badge badge-blue">飲料・酒</span>
+      <span class="badge badge-green">木工品</span>
+      <span class="badge" style="background:rgba(139,92,246,0.2);color:#8b5cf6;">模型</span>
+      <span class="badge" style="background:rgba(236,72,153,0.2);color:#ec4899;">衣類</span>
+    </div>
+
+    <div class="product-grid card-stagger">
+      <!-- Product 1 -->
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80"
+             alt="ロケット饅頭" class="product-img">
+        <div class="product-info">
+          <h4>ロケット饅頭「そらのかけはし」</h4>
+          <p class="text-sub text-xs mb-1">串本銘菓</p>
+          <span class="price">¥2,000</span>
+        </div>
+      </div>
+      <!-- Product 2 -->
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&q=80"
+             alt="芋焼酎カイロス" class="product-img">
+        <div class="product-info">
+          <h4>芋焼酎カイロス</h4>
+          <p class="text-sub text-xs mb-1">限定醸造</p>
+          <span class="price">¥2,200</span>
+        </div>
+      </div>
+      <!-- Product 3 -->
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&q=80"
+             alt="カイロス模型" class="product-img">
+        <div class="product-info">
+          <h4>カイロス 1/100スケール模型</h4>
+          <p class="text-sub text-xs mb-1">精密レプリカ</p>
+          <span class="price">¥6,600</span>
+        </div>
+      </div>
+      <!-- Product 4 -->
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"
+             alt="ロケットTシャツ" class="product-img">
+        <div class="product-info">
+          <h4>ロケットTシャツ</h4>
+          <p class="text-sub text-xs mb-1">オリジナルデザイン</p>
+          <span class="price">¥3,000〜</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-10 reveal">
+      <button class="btn btn-primary" onclick="alert('ふるさと納税サイトへのリンクは本番版で実装予定です')">
+        ふるさと納税で購入する
+      </button>
+      <p class="text-sub text-xs mt-3">※ EC機能は本番版で実装予定</p>
+    </div>
+  </section>
+
+  <!-- Section: Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <h4>Spaceport Kii Portal</h4>
+        <p class="text-sub text-sm leading-relaxed">
+          本州最南端・和歌山県串本町から、<br>宇宙と観光を結ぶプラットフォーム。
+        </p>
+      </div>
+      <div>
+        <h4>コンテンツ</h4>
+        <a href="index.html">トップ</a>
+        <a href="tours.html">ツアー・予約</a>
+        <a href="gourmet.html">グルメ</a>
+        <a href="map.html">エリアマップ</a>
+        <a href="index.html#chatbot">AIコンシェルジュ</a>
+      </div>
+      <div>
+        <h4>関連リンク</h4>
+        <a href="#">串本町観光協会</a>
+        <a href="#">スペースワン</a>
+        <a href="#">USPジャパン</a>
+      </div>
+      <div>
+        <h4>SNS</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="X">𝕏</a>
+          <a href="#" aria-label="YouTube">▶</a>
+        </div>
+        <div class="mt-4">
+          <h4 class="mt-4">言語</h4>
+          <div class="footer-lang">
+            <button class="active">JP</button>
+            <button>EN</button>
+            <button>中簡</button>
+            <button>中繁</button>
+            <button>韓</button>
+            <button>TH</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Spaceport Kii Portal. Powered by More than Six</span>
+      <span class="text-xs">プロトタイプ版 — 機能デモ用</span>
+    </div>
+  </footer>
+
+  <!-- Chatbot Widget -->
+  <button class="chatbot-toggle" aria-label="AIチャットを開く">🚀</button>
+  <div class="chatbot-panel">
+    <div class="chatbot-header">
+      <h3>🚀 ロケット観光AIコンシェルジュ</h3>
+      <div class="lang-switcher">
+        <button class="lang-btn active">JP</button>
+        <button class="lang-btn">EN</button>
+        <button class="lang-btn">中</button>
+        <button class="lang-btn">韓</button>
+        <button class="lang-btn">TH</button>
+      </div>
+    </div>
+    <div class="chatbot-quick-actions">
+      <button class="quick-btn">打上げスケジュール</button>
+      <button class="quick-btn">おすすめグルメ</button>
+      <button class="quick-btn">アクセス</button>
+      <button class="quick-btn">博物館情報</button>
+    </div>
+    <div class="chatbot-messages">
+      <div class="chat-msg user">家族4人で1泊2日、ロケット見たいです</div>
+      <div class="chat-msg ai">
+        おすすめモデルコースをご提案します！
+        <span class="emoji-line">🌅 <strong>1日目:</strong> Sora-Miru見学 → サンドリアでロケットカレー → カヤックツアー</span>
+        <span class="emoji-line">🌙 <strong>夜:</strong> Camp Resort Ohshima泊</span>
+        <span class="emoji-line">🚀 <strong>2日目:</strong> 田原海水浴場で打上げ見学 → 橋杭岩 → お土産購入</span>
+      </div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" placeholder="質問を入力...">
+      <button>▶</button>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

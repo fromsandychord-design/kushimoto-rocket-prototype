@@ -1051,10 +1051,12 @@
   // ======= フレームマッピング: UP scroll = animation forward =======
   // scrollTop最下部(spacer bottom) → frame 31(開始)
   // scrollTop最上部(0) → frame 256(終了)
-  var frameObj = { value: 0 };
   var usableFrames = CONFIG.totalFrames - CONFIG.frameOffset - 1; // 225
+  var frameObj = { value: usableFrames }; // 初期値=最下部=frame31
   var maxFrameReached = CONFIG.frameOffset; // ラチェット: 到達最大フレーム
   var animationComplete = false;
+  // 初期フレームを設定（GSAP scrub前にframe31の発射場シーンを描画）
+  state.frame = CONFIG.frameOffset;
 
   gsap.to(frameObj, {
     value: usableFrames,

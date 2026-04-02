@@ -11,6 +11,21 @@
     history.scrollRestoration = 'manual';
   }
 
+  // ======= アニメーション済みの場合はスキップ =======
+  // ?site=1 がURLにある場合、アニメーションを完全に非表示にする
+  if (window.location.search.indexOf('site=1') !== -1) {
+    var els = ['rocket-canvas', 'overlay', 'rocket-ui', 'scroll-spacer'];
+    els.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // URLからパラメータを消す（見た目をきれいに）
+    if (history.replaceState) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+    return; // IIFE終了、アニメーションコード一切実行しない
+  }
+
   // ======= CONFIG =======
   // シーン構成（カウントダウン除外、フレーム31からスタート）:
   // 1. 点火→リフトオフ 谷間の発射場 (31-60)
@@ -1096,41 +1111,17 @@
     if (animationComplete) return;
     animationComplete = true;
 
-    // ホワイトフラッシュ → フェードアウト → サイトコンテンツへ
+    // ホワイトフラッシュ → リダイレクト
     var overlay = document.getElementById('overlay');
     if (overlay) {
-      overlay.style.transition = 'opacity 0.6s ease';
+      overlay.style.transition = 'opacity 0.8s ease';
       overlay.style.opacity = '1';
     }
 
     setTimeout(function() {
-      // キャンバス・UI非表示
-      var rCanvas = document.getElementById('rocket-canvas');
-      var rUi = document.getElementById('rocket-ui');
-      if (rCanvas) rCanvas.style.display = 'none';
-      if (rUi) rUi.style.display = 'none';
-
-      // スペーサーを除去（上スクロール領域をなくす）
-      if (spacer) spacer.style.display = 'none';
-
-      // 全ScrollTriggerを一度killしてからrefresh（位置ズレ防止）
-      ScrollTrigger.getAll().forEach(function(st) { st.kill(); });
-
-      // サイトコンテンツの先頭へ
-      window.scrollTo(0, 0);
-      // 少し待ってからrefresh（DOMの変更が反映された後）
-      setTimeout(function() { ScrollTrigger.refresh(); }, 50);
-
-      // オーバーレイをフェードアウト
-      setTimeout(function() {
-        if (overlay) {
-          overlay.style.opacity = '0';
-          setTimeout(function() {
-            if (overlay) overlay.style.display = 'none';
-          }, 600);
-        }
-      }, 200);
-    }, 700);
+      // ?site=1 でリダイレクト → アニメーションなしの通常サイトが表示される
+      window.location.href = window.location.pathname + '?site=1';
+    }, 900);
   }
 
   // ======= 下スクロール時のキャンバス非表示 =======

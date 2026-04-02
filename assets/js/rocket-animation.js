@@ -45,7 +45,8 @@
   var state = {
     frame: 31, prevFrame: -1, scrollSpeed: 0, prevScrollSpeed: 0,
     scrollDirection: 1, lastScrollY: 0, lastScrollTime: 0,
-    canvasW: 0, canvasH: 0, initialized: false, vibratedIgnition: false
+    canvasW: 0, canvasH: 0, initialized: false, vibratedIgnition: false,
+    userScrolledUp: false
   };
 
   // ======= SVG ASSETS =======
@@ -1069,14 +1070,22 @@
       start: 'top top',
       end: 'bottom bottom',
       scrub: 0.5,
-      onUpdate: function() {
+      onUpdate: function(self) {
         // UP scroll → higher frame (inverted: spacer bottom=frame31, top=frame256)
         var rawFrame = (usableFrames - frameObj.value) + CONFIG.frameOffset;
-        // ラチェット: 一度到達したフレームより戻らない
-        if (rawFrame > maxFrameReached) {
-          maxFrameReached = rawFrame;
+        // ユーザーが上スクロールしたかを検出（progress減少=上方向）
+        if (self.direction === -1 && state.initialized) {
+          state.userScrolledUp = true;
         }
-        state.frame = maxFrameReached;
+        // ラチェット: 初期化完了後のみ適用（初期化前のGSAP誤発火を防止）
+        if (!state.initialized) {
+          state.frame = CONFIG.frameOffset; // 初期化前は常にframe31
+        } else {
+          if (rawFrame > maxFrameReached) {
+            maxFrameReached = rawFrame;
+          }
+          state.frame = maxFrameReached;
+        }
         updateScrollSpeed();
       }
     }
@@ -1218,7 +1227,8 @@
     updateHeroTitle(frame);
 
     // アニメーション完了チェック（最終フレーム到達）
-    if (frame >= CONFIG.totalFrames - 2 && !animationComplete) {
+    // state.initialized=true かつ ユーザーが上スクロール済みの場合のみ
+    if (frame >= CONFIG.totalFrames - 2 && !animationComplete && state.initialized && state.userScrolledUp) {
       transitionToSite();
     }
 

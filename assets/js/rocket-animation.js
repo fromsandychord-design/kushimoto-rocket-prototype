@@ -6,6 +6,11 @@
 (function() {
   'use strict';
 
+  // ブラウザのスクロール位置復元を無効化（リロード時に正しい位置に戻すため）
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
   // ======= CONFIG =======
   // シーン構成（カウントダウン除外、フレーム31からスタート）:
   // 1. 点火→リフトオフ 谷間の発射場 (31-60)
@@ -1022,18 +1027,26 @@
   // ページロード時にスペーサーの最下部（サイトコンテンツの直前）に配置
   // 上スクロール → アニメーション再生 / 下スクロール → 通常サイト
   var spacer = document.getElementById('scroll-spacer');
+
+  // 即座にスペーサー最下部へ（DOMContentLoaded前でも実行）
   function scrollToSpacerBottom() {
     if (spacer) {
       var targetY = spacer.offsetTop + spacer.offsetHeight - window.innerHeight;
       window.scrollTo(0, targetY);
-      setTimeout(function() {
-        ScrollTrigger.refresh();
-        window.scrollTo(0, targetY);
-      }, 100);
     }
   }
-  window.addEventListener('load', scrollToSpacerBottom);
-  if (document.readyState === 'complete') scrollToSpacerBottom();
+  // 複数タイミングで実行し確実に位置を合わせる
+  scrollToSpacerBottom();
+  window.addEventListener('load', function() {
+    scrollToSpacerBottom();
+    setTimeout(function() {
+      ScrollTrigger.refresh();
+      scrollToSpacerBottom();
+    }, 150);
+  });
+  if (document.readyState === 'complete') {
+    scrollToSpacerBottom();
+  }
 
   // ======= フレームマッピング: UP scroll = animation forward =======
   // scrollTop最下部(spacer bottom) → frame 31(開始)

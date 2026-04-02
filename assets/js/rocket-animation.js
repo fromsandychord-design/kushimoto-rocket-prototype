@@ -16,12 +16,12 @@
   // 1. 点火→リフトオフ 谷間の発射場 (31-60)
   // 2. 橋杭岩遠景から眺める上昇（感動シーン）(61-90)
   // 3. 近景に戻って上昇 (91-97)
-  // 4. 斜め上POV 雲を突き抜ける（長め）(98-187)
-  // 5. 同アングルで空が青→藍→黒 (188-217)
-  // 6. 宇宙・地球の曲率 (218-242)
-  // 7. 衛星軌道投入・デプロイ (243-256)
+  // 4. 斜め上POV 雲を突き抜ける（短縮: 98-127, 元の1/3）
+  // 5. 同アングルで空が青→藍→黒 (128-157)
+  // 6. 宇宙・地球の曲率 (158-182)
+  // 7. 衛星軌道投入・デプロイ (183-196)
   var CONFIG = {
-    totalFrames: 257,
+    totalFrames: 197,
     frameOffset: 31,       // カウントダウンをスキップ、フレーム31から開始
     scrollHeight: 15000,   // 元の1/3
     maxDpr: 2,
@@ -29,10 +29,10 @@
       { name: 'ignition',     start: 31,  end: 60 },
       { name: 'distantView',  start: 61,  end: 90 },
       { name: 'closeAscent',  start: 91,  end: 97 },
-      { name: 'cloudPOV',     start: 98,  end: 187 },
-      { name: 'toSpace',      start: 188, end: 217 },
-      { name: 'space',        start: 218, end: 242 },
-      { name: 'deployment',   start: 243, end: 256 }
+      { name: 'cloudPOV',     start: 98,  end: 127 },
+      { name: 'toSpace',      start: 128, end: 157 },
+      { name: 'space',        start: 158, end: 182 },
+      { name: 'deployment',   start: 183, end: 196 }
     ],
     particles: { smokeMax: 250, cloudMax: 200, starMax: 300, exhaustMax: 150 },
     colors: {
@@ -1226,10 +1226,13 @@
     // ヒーロータイトルの表示制御
     updateHeroTitle(frame);
 
-    // アニメーション完了チェック（最終フレーム到達）
+    // アニメーション完了チェック
     // state.initialized=true かつ ユーザーが上スクロール済みの場合のみ
-    if (frame >= CONFIG.totalFrames - 2 && !animationComplete && state.initialized && state.userScrolledUp) {
-      transitionToSite();
+    if (!animationComplete && state.initialized && state.userScrolledUp) {
+      // フレームが最終付近 OR scrollYがほぼ0（ページ最上部到達）
+      if (frame >= CONFIG.totalFrames - 5 || window.scrollY < 100) {
+        transitionToSite();
+      }
     }
 
     state.prevFrame = frame;

@@ -1018,10 +1018,30 @@
     if (state.scrollSpeed < 0.01) state.scrollSpeed = 0;
   }
 
-  // フレームマッピング: DOWN scroll = animation forward
-  // frameObj: 0→225, offset by 31 → actual frames 31→256
+  // ======= 初期スクロール位置 =======
+  // ページロード時にスペーサーの最下部（サイトコンテンツの直前）に配置
+  // 上スクロール → アニメーション再生 / 下スクロール → 通常サイト
+  var spacer = document.getElementById('scroll-spacer');
+  function scrollToSpacerBottom() {
+    if (spacer) {
+      var targetY = spacer.offsetTop + spacer.offsetHeight - window.innerHeight;
+      window.scrollTo(0, targetY);
+      setTimeout(function() {
+        ScrollTrigger.refresh();
+        window.scrollTo(0, targetY);
+      }, 100);
+    }
+  }
+  window.addEventListener('load', scrollToSpacerBottom);
+  if (document.readyState === 'complete') scrollToSpacerBottom();
+
+  // ======= フレームマッピング: UP scroll = animation forward =======
+  // scrollTop最下部(spacer bottom) → frame 31(開始)
+  // scrollTop最上部(0) → frame 256(終了)
   var frameObj = { value: 0 };
   var usableFrames = CONFIG.totalFrames - CONFIG.frameOffset - 1; // 225
+  var maxFrameReached = CONFIG.frameOffset; // ラチェット: 到達最大フレーム
+  var animationComplete = false;
 
   gsap.to(frameObj, {
     value: usableFrames,
@@ -1033,30 +1053,71 @@
       end: 'bottom bottom',
       scrub: 0.5,
       onUpdate: function() {
-        // DOWN scroll → frame increases (31→256)
-        state.frame = frameObj.value + CONFIG.frameOffset;
+        // UP scroll → higher frame (inverted: spacer bottom=frame31, top=frame256)
+        var rawFrame = (usableFrames - frameObj.value) + CONFIG.frameOffset;
+        // ラチェット: 一度到達したフレームより戻らない
+        if (rawFrame > maxFrameReached) {
+          maxFrameReached = rawFrame;
+        }
+        state.frame = maxFrameReached;
         updateScrollSpeed();
       }
     }
   });
 
-  // ======= CANVAS FADE-OUT =======
-  // アニメーション終了時（スペーサーを過ぎたら）キャンバスとオーバーレイをフェードアウト
+  // ======= アニメーション完了 → サイトへ遷移 =======
+  function transitionToSite() {
+    if (animationComplete) return;
+    animationComplete = true;
+
+    // ホワイトフラッシュ → フェードアウト → サイトコンテンツへ
+    var overlay = document.getElementById('overlay');
+    if (overlay) {
+      overlay.style.transition = 'opacity 0.6s ease';
+      overlay.style.opacity = '1';
+    }
+
+    setTimeout(function() {
+      // キャンバス・UI非表示
+      var rCanvas = document.getElementById('rocket-canvas');
+      var rUi = document.getElementById('rocket-ui');
+      if (rCanvas) rCanvas.style.display = 'none';
+      if (rUi) rUi.style.display = 'none';
+
+      // スペーサーを除去（上スクロール領域をなくす）
+      if (spacer) spacer.style.display = 'none';
+
+      // サイトコンテンツの先頭へ
+      window.scrollTo(0, 0);
+      ScrollTrigger.refresh();
+
+      // オーバーレイをフェードアウト
+      setTimeout(function() {
+        if (overlay) {
+          overlay.style.opacity = '0';
+          setTimeout(function() {
+            if (overlay) overlay.style.display = 'none';
+          }, 600);
+        }
+      }, 200);
+    }, 700);
+  }
+
+  // ======= 下スクロール時のキャンバス非表示 =======
+  // サイトコンテンツ領域に入ったらキャンバスをフェードアウト
   ScrollTrigger.create({
-    trigger: '#scroll-spacer',
-    start: 'bottom bottom',
-    end: 'bottom top',
-    onLeave: function() {
-      // スペーサーを通り過ぎたらフェードアウト
-      gsap.to('#rocket-canvas', { opacity: 0, duration: 0.8, ease: 'power2.out' });
-      gsap.to('#overlay', { opacity: 0, duration: 0.8, ease: 'power2.out' });
-      gsap.to('#rocket-ui', { opacity: 0, duration: 0.8, ease: 'power2.out' });
+    trigger: '#site-content',
+    start: 'top bottom',
+    end: 'top top',
+    onEnter: function() {
+      gsap.to('#rocket-canvas', { opacity: 0, duration: 0.5, ease: 'power2.out' });
+      gsap.to('#rocket-ui', { opacity: 0, duration: 0.5, ease: 'power2.out' });
     },
-    onEnterBack: function() {
-      // スクロールバックしたら表示
-      gsap.to('#rocket-canvas', { opacity: 1, duration: 0.5, ease: 'power2.in' });
-      gsap.to('#overlay', { opacity: 1, duration: 0.5, ease: 'power2.in' });
-      gsap.to('#rocket-ui', { opacity: 1, duration: 0.5, ease: 'power2.in' });
+    onLeaveBack: function() {
+      if (!animationComplete) {
+        gsap.to('#rocket-canvas', { opacity: 1, duration: 0.3, ease: 'power2.in' });
+        gsap.to('#rocket-ui', { opacity: 1, duration: 0.3, ease: 'power2.in' });
+      }
     }
   });
 
@@ -1134,6 +1195,11 @@
     // ヒーロータイトルの表示制御
     updateHeroTitle(frame);
 
+    // アニメーション完了チェック（最終フレーム到達）
+    if (frame >= CONFIG.totalFrames - 2 && !animationComplete) {
+      transitionToSite();
+    }
+
     state.prevFrame = frame;
     requestAnimationFrame(render);
   }
@@ -1173,24 +1239,20 @@
       if (loadingBar) loadingBar.style.width = loadProgress + '%';
     }, 100);
 
-    // スキップボタン: スペーサーの終わりまでスクロール
+    // スキップボタン: アニメーションをスキップしてサイトへ
     if (skipBtn) {
       skipBtn.addEventListener('click', function() {
-        var spacer = document.getElementById('scroll-spacer');
-        if (spacer) {
-          var spacerEnd = spacer.offsetTop + spacer.offsetHeight;
-          window.scrollTo({ top: spacerEnd, behavior: 'smooth' });
-        }
+        transitionToSite();
       });
     }
 
-    // スクロールヒントの非表示
+    // スクロールヒントの非表示（上スクロールで50px以上動いたら）
     var hintHidden = false;
     var initialScrollY = null;
     window.addEventListener('scroll', function() {
       if (initialScrollY === null) initialScrollY = window.scrollY;
-      // DOWN scroll で50px以上動いたら非表示
-      if (!hintHidden && window.scrollY - initialScrollY > 50) {
+      // UP scroll で50px以上動いたら非表示
+      if (!hintHidden && initialScrollY - window.scrollY > 50) {
         if (scrollHint) {
           scrollHint.style.opacity = '0';
           scrollHint.style.transition = 'opacity 0.5s';
@@ -1200,7 +1262,7 @@
       }
     });
 
-    // ページはトップから開始（scrollToBottomは不要）
+    // ページはスペーサー最下部から開始（scrollToSpacerBottomで設定済み）
     requestAnimationFrame(render);
   }
 

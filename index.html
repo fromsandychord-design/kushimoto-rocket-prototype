@@ -66,10 +66,10 @@
     }
     #scroll-hint .arrow {
       font-size: 28px; display: block; margin-bottom: 10px;
-      animation: arrowBounceDown 1.5s ease-in-out infinite;
+      animation: arrowBounceUp 1.5s ease-in-out infinite;
     }
     @keyframes hintPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
-    @keyframes arrowBounceDown { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+    @keyframes arrowBounceUp { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
     /* ---- Skip Button ---- */
     #skip-btn {
@@ -175,8 +175,8 @@
     </div>
     <!-- Scroll Hint (down arrow) -->
     <div id="scroll-hint" style="display:none;">
-      <span class="arrow">↓</span>
-      スクロールして発射
+      <span class="arrow">↑</span>
+      上にスワイプして発射
     </div>
     <!-- Skip Button -->
     <button id="skip-btn" style="display:none;">SKIP →</button>

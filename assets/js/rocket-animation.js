@@ -1052,14 +1052,16 @@
   // scrollTop最下部(spacer bottom) → frame 31(開始)
   // scrollTop最上部(0) → frame 256(終了)
   var usableFrames = CONFIG.totalFrames - CONFIG.frameOffset - 1; // 225
-  var frameObj = { value: usableFrames }; // 初期値=最下部=frame31
+  var frameObj = { value: usableFrames }; // 初期値=最下部=frame31に対応
   var maxFrameReached = CONFIG.frameOffset; // ラチェット: 到達最大フレーム
   var animationComplete = false;
   // 初期フレームを設定（GSAP scrub前にframe31の発射場シーンを描画）
   state.frame = CONFIG.frameOffset;
 
-  gsap.to(frameObj, {
-    value: usableFrames,
+  // fromTo で明示的に0→225の範囲を指定（to だと初期値=目標値で動かない）
+  gsap.fromTo(frameObj,
+    { value: 0 },
+    { value: usableFrames,
     snap: 'value',
     ease: 'none',
     scrollTrigger: {
@@ -1102,9 +1104,13 @@
       // スペーサーを除去（上スクロール領域をなくす）
       if (spacer) spacer.style.display = 'none';
 
+      // 全ScrollTriggerを一度killしてからrefresh（位置ズレ防止）
+      ScrollTrigger.getAll().forEach(function(st) { st.kill(); });
+
       // サイトコンテンツの先頭へ
       window.scrollTo(0, 0);
-      ScrollTrigger.refresh();
+      // 少し待ってからrefresh（DOMの変更が反映された後）
+      setTimeout(function() { ScrollTrigger.refresh(); }, 50);
 
       // オーバーレイをフェードアウト
       setTimeout(function() {

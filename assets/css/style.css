@@ -948,15 +948,7 @@ body {
 }
 
 /* --- GSAP Reveal --- */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-}
-
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* Initial state is set by GSAP JS, not CSS, to ensure content is visible if JS fails */
 
 /* --- Badge --- */
 .badge {

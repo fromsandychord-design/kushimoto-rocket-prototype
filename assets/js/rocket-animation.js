@@ -1119,10 +1119,11 @@
   }
 
   // ======= 下スクロール時のキャンバス非表示 =======
-  // サイトコンテンツ領域に入ったらキャンバスをフェードアウト
+  // サイトコンテンツが画面の50%以上占めたらキャンバスをフェードアウト
+  // （初期位置でビューポート底辺がsite-contentに触れるため、余裕を持たせる）
   ScrollTrigger.create({
     trigger: '#site-content',
-    start: 'top bottom',
+    start: 'top 50%',  // site-contentの上端が画面の50%に来たとき
     end: 'top top',
     onEnter: function() {
       gsap.to('#rocket-canvas', { opacity: 0, duration: 0.5, ease: 'power2.out' });

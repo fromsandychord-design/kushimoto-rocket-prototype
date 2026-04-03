@@ -328,6 +328,13 @@
     exhaust: new ParticlePool(CONFIG.particles.exhaustMax)
   };
 
+  // ======= EASING UTILITIES =======
+  var Ease = {
+    inCubic: function(t) { return t * t * t; },
+    outCubic: function(t) { return 1 - Math.pow(1 - t, 3); },
+    inOutCubic: function(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  };
+
   // ======= EFFECTS =======
   var FX = {
     speedLines: function(ctx, w, h, intensity) {
@@ -513,73 +520,130 @@
     scene2: function(ctx, w, h, progress, speed) {
       var t = performance.now();
 
-      // 空（明るい青空＋白い雲）
-      this.gradBg(ctx, w, h, [
-        [0, '#4488cc'], [0.3, '#5599dd'], [0.5, '#77aadd'],
-        [0.7, '#99bbdd'], [1, '#bbccdd']
-      ]);
-      ctx.save(); ctx.globalAlpha = 0.5;
-      [[w * 0.15, h * 0.2, 160, 40], [w * 0.6, h * 0.15, 200, 50],
-       [w * 0.85, h * 0.25, 130, 35], [w * 0.35, h * 0.08, 180, 45]].forEach(function(c) {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.ellipse(c[0], c[1], c[2], c[3], 0, 0, Math.PI * 2); ctx.fill();
-      });
-      ctx.restore();
+      // --- Step 3-1: イージング（最初ゆっくり→加速） ---
+      progress = Ease.inCubic(progress);
 
+      // --- Step 3-4: カメラワーク 振動（点火の瞬間） ---
+      var SHAKE = { intensity: 3, decay: 0.7 };
+      var shakeActive = progress < 0.3 && progress > 0;
+      if (shakeActive) {
+        var shake = SHAKE.intensity * (1 - progress / 0.3) * SHAKE.decay;
+        ctx.save();
+        ctx.translate(
+          (Math.random() - 0.5) * shake * 2,
+          (Math.random() - 0.5) * shake * 2
+        );
+      }
+
+      // --- Phase 2: drawImage()ベースの背景描画 ---
+      var bgImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene2-bg') : null;
+      if (bgImg) {
+        ctx.drawImage(bgImg, 0, 0, w, h);
+      } else {
+        /* PHASE1: プログラマティック背景（フォールバック） */
+        this.gradBg(ctx, w, h, [
+          [0, '#4488cc'], [0.3, '#5599dd'], [0.5, '#77aadd'],
+          [0.7, '#99bbdd'], [1, '#bbccdd']
+        ]);
+        ctx.save(); ctx.globalAlpha = 0.5;
+        [[w * 0.15, h * 0.2, 160, 40], [w * 0.6, h * 0.15, 200, 50],
+         [w * 0.85, h * 0.25, 130, 35], [w * 0.35, h * 0.08, 180, 45]].forEach(function(c) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath(); ctx.ellipse(c[0], c[1], c[2], c[3], 0, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.restore();
+        /* /PHASE1 */
+
+        /* PHASE1: プログラマティック地形（フォールバック） */
+        // 奥の海
+        ctx.fillStyle = '#5588aa';
+        ctx.fillRect(w * 0.3, h * 0.45, w * 0.4, h * 0.1);
+        // 左の山
+        ctx.fillStyle = '#2a6a2a';
+        ctx.beginPath();
+        ctx.moveTo(-w * 0.1, h);
+        ctx.bezierCurveTo(0, h * 0.3, w * 0.15, h * 0.2, w * 0.25, h * 0.35);
+        ctx.bezierCurveTo(w * 0.3, h * 0.45, w * 0.33, h * 0.5, w * 0.35, h);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#3a7a3a';
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.6);
+        ctx.bezierCurveTo(w * 0.05, h * 0.35, w * 0.12, h * 0.25, w * 0.2, h * 0.38);
+        ctx.lineTo(w * 0.15, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fill();
+        // 右の山
+        ctx.fillStyle = '#2a6a2a';
+        ctx.beginPath();
+        ctx.moveTo(w * 0.65, h);
+        ctx.bezierCurveTo(w * 0.67, h * 0.5, w * 0.75, h * 0.2, w * 0.85, h * 0.3);
+        ctx.bezierCurveTo(w * 0.95, h * 0.4, w * 1.05, h * 0.35, w * 1.1, h);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#3a8a3a';
+        ctx.beginPath();
+        ctx.moveTo(w * 0.7, h);
+        ctx.bezierCurveTo(w * 0.72, h * 0.55, w * 0.78, h * 0.3, w * 0.88, h * 0.35);
+        ctx.lineTo(w, h); ctx.closePath(); ctx.fill();
+        // 発射台
+        var padYfb = h * 0.78;
+        ctx.fillStyle = '#888880';
+        ctx.fillRect(w * 0.38, padYfb, w * 0.24, h * 0.05);
+        ctx.fillStyle = '#666660';
+        ctx.fillRect(w * 0.4, padYfb + h * 0.04, w * 0.04, h * 0.03);
+        ctx.fillRect(w * 0.56, padYfb + h * 0.04, w * 0.04, h * 0.03);
+        ctx.fillStyle = '#8a8070';
+        ctx.fillRect(0, padYfb + h * 0.06, w, h);
+        /* /PHASE1 */
+      }
+
+      // --- フレーム進行計算（Phase 1から移植） ---
       var ignitePhase = Math.min(progress / 0.15, 1);
       var liftPhase = Math.max(0, (progress - 0.15) / 0.85);
       var liftEase = liftPhase * liftPhase;
 
+      // SVG.drawRocketの基準サイズ: 高さ約121単位（ノーズ-62〜ノズル+59）、ノズル先端y=+56
+      var SVG_ROCKET_HEIGHT = 121;
+      var SVG_ROCKET_NOZZLE_Y = 56;
       var rocketScale = 3.0;
       var baseY = h * 0.5;
       var rocketY = baseY - liftEase * h * 1.5;
-
-      // 奥の海
-      ctx.fillStyle = '#5588aa';
-      ctx.fillRect(w * 0.3, h * 0.45, w * 0.4, h * 0.1);
-
-      // 左の山
-      ctx.fillStyle = '#2a6a2a';
-      ctx.beginPath();
-      ctx.moveTo(-w * 0.1, h);
-      ctx.bezierCurveTo(0, h * 0.3, w * 0.15, h * 0.2, w * 0.25, h * 0.35);
-      ctx.bezierCurveTo(w * 0.3, h * 0.45, w * 0.33, h * 0.5, w * 0.35, h);
-      ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#3a7a3a';
-      ctx.beginPath();
-      ctx.moveTo(0, h * 0.6);
-      ctx.bezierCurveTo(w * 0.05, h * 0.35, w * 0.12, h * 0.25, w * 0.2, h * 0.38);
-      ctx.lineTo(w * 0.15, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fill();
-
-      // 右の山
-      ctx.fillStyle = '#2a6a2a';
-      ctx.beginPath();
-      ctx.moveTo(w * 0.65, h);
-      ctx.bezierCurveTo(w * 0.67, h * 0.5, w * 0.75, h * 0.2, w * 0.85, h * 0.3);
-      ctx.bezierCurveTo(w * 0.95, h * 0.4, w * 1.05, h * 0.35, w * 1.1, h);
-      ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#3a8a3a';
-      ctx.beginPath();
-      ctx.moveTo(w * 0.7, h);
-      ctx.bezierCurveTo(w * 0.72, h * 0.55, w * 0.78, h * 0.3, w * 0.88, h * 0.35);
-      ctx.lineTo(w, h); ctx.closePath(); ctx.fill();
-
-      // 発射台
       var padY = h * 0.78;
-      ctx.fillStyle = '#888880';
-      ctx.fillRect(w * 0.38, padY, w * 0.24, h * 0.05);
-      ctx.fillStyle = '#666660';
-      ctx.fillRect(w * 0.4, padY + h * 0.04, w * 0.04, h * 0.03);
-      ctx.fillRect(w * 0.56, padY + h * 0.04, w * 0.04, h * 0.03);
-      ctx.fillStyle = '#8a8070';
-      ctx.fillRect(0, padY + h * 0.06, w, h);
 
-      // ロケット
-      SVG.drawRocket(ctx, w * 0.5, rocketY, rocketScale);
+      // --- Phase 2: drawImage()ベースのロケット描画 ---
+      var rocketImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene2-rocket') : null;
+      var exhaustY, exhaustScale;
+      if (rocketImg) {
+        // 画像サイズからSVG基準と同等のスケールを算出
+        // SVGロケットの表示高さ = SVG_ROCKET_HEIGHT * rocketScale = 363px
+        // 画像をこの高さに合わせるスケール:
+        var imgScale = (SVG_ROCKET_HEIGHT * rocketScale) / rocketImg.height;
+        ctx.save();
+        ctx.translate(w * 0.5, rocketY);
+        ctx.scale(imgScale, imgScale);
+        ctx.drawImage(rocketImg, -rocketImg.width / 2, -rocketImg.height / 2);
+        ctx.restore();
 
-      // 噴射
-      var exhaustY = rocketY + rocketScale * 56;
-      SVG.drawExhaustFlare(ctx, w * 0.5, exhaustY, rocketScale * 0.8, ignitePhase);
+        // 噴射位置: ロケット画像の下端（=中心 + 高さ/2 * スケール）
+        exhaustY = rocketY + (rocketImg.height / 2) * imgScale;
+        exhaustScale = rocketScale * 0.8;
+      } else {
+        /* PHASE1: プログラマティックロケット描画（フォールバック） */
+        SVG.drawRocket(ctx, w * 0.5, rocketY, rocketScale);
+        /* /PHASE1 */
+        exhaustY = rocketY + rocketScale * SVG_ROCKET_NOZZLE_Y;
+        exhaustScale = rocketScale * 0.8;
+      }
+
+      // --- 噴射エフェクト（既存のまま維持） ---
+      SVG.drawExhaustFlare(ctx, w * 0.5, exhaustY, exhaustScale, ignitePhase);
+
+      // --- Step 3-5①: 加算合成 噴射炎の発光 ---
+      if (ignitePhase > 0.1) {
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.beginPath();
+        ctx.arc(w * 0.5, exhaustY, 20 * ignitePhase, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 200, 100, ' + (0.3 * ignitePhase) + ')';
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+      }
 
       // レンズフレア
       if (ignitePhase > 0.3) {
@@ -594,7 +658,7 @@
         ctx.restore();
       }
 
-      // 大量の白い煙
+      // --- パーティクルエフェクト（既存のまま維持） ---
       if (ignitePhase > 0.15) {
         var sr = ignitePhase;
         if (Math.random() < sr) {
@@ -639,6 +703,11 @@
 
       P.smoke.update(); P.smoke.draw(ctx);
       P.exhaust.update(); P.exhaust.draw(ctx);
+
+      // --- Step 3-4: 振動restore ---
+      if (shakeActive) {
+        ctx.restore();
+      }
     },
 
     // ====== Scene 3: 橋杭岩遠景から眺める上昇（感動シーン）(61-90) ======
@@ -651,48 +720,91 @@
     scene4: function(ctx, w, h, progress, speed) {
       var t = performance.now();
 
-      this.gradBg(ctx, w, h, [
-        [0, '#1a4a8a'], [0.5, '#4a80cc'], [1, '#8ab8ee']
-      ]);
+      // --- ロケット共通パラメータ（if/else・パーティクルで共用） ---
+      var rocketX = w * 0.5, rocketY = h * 0.35;
+      var rocketScale = 2.5;
+      var exhaustY = rocketY + rocketScale * 56;
 
-      // 地上が離れていく
-      var groundDrop = progress * h * 2;
-      var groundY = h * 0.85 + groundDrop;
-      if (groundY < h + 200) {
-        ctx.fillStyle = '#1a3a1a';
-        ctx.beginPath(); ctx.moveTo(0, groundY);
-        for (var x = 0; x <= w; x += 30) {
-          ctx.lineTo(x, groundY - 10 - Math.sin(x * 0.01) * 15 - Math.cos(x * 0.02) * 8);
+      // --- Phase 2: 3レイヤー drawImage() 描画 ---
+      var bgImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene4-silhouette-bg') : null;
+      var mgImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene4-silhouette-mg') : null;
+      var fgImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene4-silhouette-fg') : null;
+
+      if (bgImg && mgImg && fgImg) {
+        // --- Step 3-2: パララックス定数 ---
+        var PARALLAX = { bg: 0.5, mg: 1.0, fg: 1.5 };
+        var PARALLAX_RANGE = 0.1; // 画面高さの10%を移動量
+        var baseOffset = progress * h * PARALLAX_RANGE;
+        var drawH = h * 1.15; // 余白防止: 15%大きく描画
+
+        // レイヤー1: 遠景（空・海）— 最背面（ゆっくり移動）
+        ctx.drawImage(bgImg, 0, -baseOffset * PARALLAX.bg, w, drawH);
+
+        // レイヤー2: 中景（山）— 標準速度
+        ctx.drawImage(mgImg, 0, -baseOffset * PARALLAX.mg, w, drawH);
+
+        // ロケット（中景と近景の間に描画 — 前景の木々の手前をロケットが通過）
+        SVG.drawRocket(ctx, rocketX, rocketY, rocketScale);
+        SVG.drawExhaustFlare(ctx, rocketX, exhaustY, 2, 0.8);
+
+        // 飛行機雲（真下）
+        ctx.save();
+        var trailLen = h - exhaustY;
+        var tg = ctx.createLinearGradient(rocketX, exhaustY + 30, rocketX, exhaustY + trailLen);
+        tg.addColorStop(0, 'rgba(255,255,255,0.5)');
+        tg.addColorStop(0.3, 'rgba(255,255,255,0.2)');
+        tg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.strokeStyle = tg; ctx.lineWidth = 5 + progress * 3;
+        ctx.beginPath(); ctx.moveTo(rocketX, exhaustY + 30); ctx.lineTo(rocketX, exhaustY + trailLen); ctx.stroke();
+        ctx.restore();
+
+        // レイヤー3: 近景（暗い木々フレーム）— 最前面（速く移動）
+        ctx.drawImage(fgImg, 0, -baseOffset * PARALLAX.fg, w, drawH);
+      } else {
+        /* PHASE1: プログラマティック背景+地形（フォールバック） */
+        this.gradBg(ctx, w, h, [
+          [0, '#1a4a8a'], [0.5, '#4a80cc'], [1, '#8ab8ee']
+        ]);
+
+        // 地上が離れていく
+        var groundDrop = progress * h * 2;
+        var groundY = h * 0.85 + groundDrop;
+        if (groundY < h + 200) {
+          ctx.fillStyle = '#1a3a1a';
+          ctx.beginPath(); ctx.moveTo(0, groundY);
+          for (var x = 0; x <= w; x += 30) {
+            ctx.lineTo(x, groundY - 10 - Math.sin(x * 0.01) * 15 - Math.cos(x * 0.02) * 8);
+          }
+          ctx.lineTo(w, h + 500); ctx.lineTo(0, h + 500); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = 'rgba(0,80,150,0.4)';
+          ctx.fillRect(0, groundY + 20, w, h);
         }
-        ctx.lineTo(w, h + 500); ctx.lineTo(0, h + 500); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = 'rgba(0,80,150,0.4)';
-        ctx.fillRect(0, groundY + 20, w, h);
+
+        // ロケット
+        SVG.drawRocket(ctx, rocketX, rocketY, rocketScale);
+        SVG.drawExhaustFlare(ctx, rocketX, exhaustY, 2, 0.8);
+
+        // 飛行機雲（真下）
+        ctx.save();
+        var trailLen = h - exhaustY + groundDrop * 0.5;
+        var tg = ctx.createLinearGradient(rocketX, exhaustY + 30, rocketX, exhaustY + trailLen);
+        tg.addColorStop(0, 'rgba(255,255,255,0.5)');
+        tg.addColorStop(0.3, 'rgba(255,255,255,0.2)');
+        tg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.strokeStyle = tg; ctx.lineWidth = 5 + progress * 3;
+        ctx.beginPath(); ctx.moveTo(rocketX, exhaustY + 30); ctx.lineTo(rocketX, exhaustY + trailLen); ctx.stroke();
+        ctx.restore();
+        /* /PHASE1 */
       }
 
-      // ロケット
-      var rocketX = w * 0.5, rocketY = h * 0.35;
-      SVG.drawRocket(ctx, rocketX, rocketY, 2.5);
-      var exhaustY = rocketY + 2.5 * 56;
-      SVG.drawExhaustFlare(ctx, rocketX, exhaustY, 2, 0.8);
-
-      // 飛行機雲（真下）
-      ctx.save();
-      var trailLen = h - exhaustY + groundDrop * 0.5;
-      var tg = ctx.createLinearGradient(rocketX, exhaustY + 30, rocketX, exhaustY + trailLen);
-      tg.addColorStop(0, 'rgba(255,255,255,0.5)');
-      tg.addColorStop(0.3, 'rgba(255,255,255,0.2)');
-      tg.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.strokeStyle = tg; ctx.lineWidth = 5 + progress * 3;
-      ctx.beginPath(); ctx.moveTo(rocketX, exhaustY + 30); ctx.lineTo(rocketX, exhaustY + trailLen); ctx.stroke();
-      ctx.restore();
-
+      // --- パーティクル（共通: 画像/フォールバック両方で使う） ---
       P.smoke.emitBurst({
         x: rocketX, y: exhaustY + 10, vx: 0, vy: 4, vxSpread: 5, vySpread: 2,
         size: 5 + Math.random() * 6, color: 'rgba(255,255,255,0.25)', life: 35, drag: 0.96, gravity: 0.02
       }, 3);
       P.smoke.update(); P.smoke.draw(ctx);
 
-      // 雲が近づいてくる
+      // 雲が近づいてくる（画像モードでも使用 — 前景の上にオーバーレイ）
       if (progress > 0.6) {
         var cloudApproach = (progress - 0.6) / 0.4;
         ctx.save();
@@ -708,7 +820,7 @@
         ctx.restore();
       }
 
-      // 速度線
+      // 速度線（画像モードでも使用 — エフェクトレイヤー）
       if (speed > 0.05 || progress > 0.2) {
         var lineI = Math.max(speed, progress * 0.6);
         var count = Math.floor(lineI * 30);
@@ -729,40 +841,90 @@
       }
     },
 
-    // ====== Scene 5: 斜め上POV 雲を突き抜ける (98-187) ======
+    // ====== Scene 5: 斜め上POV 雲を突き抜ける (98-127) ======
     scene5: function(ctx, w, h, progress, speed) {
       var t = performance.now();
 
-      var inCloudP = Math.min(progress / 0.4, 1);
-      var breakP = Math.max(0, Math.min((progress - 0.4) / 0.3, 1));
-      var aboveP = Math.max(0, (progress - 0.7) / 0.3);
+      // --- Step 3-1: イージング（突入で加速、抜けで減速） ---
+      progress = Ease.inOutCubic(progress);
 
-      // 背景: 白→青→深い青
-      if (progress < 0.5) {
-        var density = 1 - progress * 1.5;
-        ctx.fillStyle = 'rgba(230,235,245,' + Math.max(0, density) + ')';
-        ctx.fillRect(0, 0, w, h);
-        if (density < 1) {
-          this.gradBg(ctx, w, h, [
-            [0, 'rgba(40,90,170,' + (1 - density) + ')'],
-            [1, 'rgba(120,170,220,' + (1 - density) + ')']
-          ]);
-          ctx.fillStyle = 'rgba(230,235,245,' + (density * 0.8) + ')';
-          ctx.fillRect(0, 0, w, h);
+      // --- Step 3-4: カメラワーク ズーム（雲突入→抜け） ---
+      var ZOOM = { max: 1.05 };
+      var zoomScale = 1 + (ZOOM.max - 1) * Math.sin(progress * Math.PI);
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.scale(zoomScale, zoomScale);
+      ctx.translate(-w / 2, -h / 2);
+
+      // --- Phase 2: クロスフェード定数（後から調整可能） ---
+      var SCENE5_FADE_START = 0.4;
+      var SCENE5_FADE_END = 0.6;
+
+      var cloudImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene5a-cloud') : null;
+      var skyImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene5b-sky') : null;
+
+      if (cloudImg && skyImg) {
+        // --- Phase 2: drawImage()ベース 2枚クロスフェード ---
+        if (progress < SCENE5_FADE_START) {
+          // 雲突入のみ
+          ctx.drawImage(cloudImg, 0, 0, w, h);
+        } else if (progress > SCENE5_FADE_END) {
+          // 雲抜けのみ
+          ctx.drawImage(skyImg, 0, 0, w, h);
+        } else {
+          // クロスフェード区間
+          var fade = (progress - SCENE5_FADE_START) / (SCENE5_FADE_END - SCENE5_FADE_START);
+          ctx.globalAlpha = 1;
+          ctx.drawImage(cloudImg, 0, 0, w, h);
+          ctx.globalAlpha = fade;
+          ctx.drawImage(skyImg, 0, 0, w, h);
+          ctx.globalAlpha = 1;
         }
       } else {
-        var skyP = (progress - 0.5) / 0.5;
-        this.gradBg(ctx, w, h, [
-          [0, 'hsl(215, ' + (55 - skyP * 15) + '%, ' + (25 - skyP * 10) + '%)'],
-          [1, 'hsl(210, ' + (50 - skyP * 20) + '%, ' + (45 - skyP * 20) + '%)']
-        ]);
+        /* PHASE1: プログラマティック背景（フォールバック） */
+        var inCloudP = Math.min(progress / 0.4, 1);
+        var breakP = Math.max(0, Math.min((progress - 0.4) / 0.3, 1));
+        var aboveP = Math.max(0, (progress - 0.7) / 0.3);
+
+        // 背景: 白→青→深い青
+        if (progress < 0.5) {
+          var density = 1 - progress * 1.5;
+          ctx.fillStyle = 'rgba(230,235,245,' + Math.max(0, density) + ')';
+          ctx.fillRect(0, 0, w, h);
+          if (density < 1) {
+            this.gradBg(ctx, w, h, [
+              [0, 'rgba(40,90,170,' + (1 - density) + ')'],
+              [1, 'rgba(120,170,220,' + (1 - density) + ')']
+            ]);
+            ctx.fillStyle = 'rgba(230,235,245,' + (density * 0.8) + ')';
+            ctx.fillRect(0, 0, w, h);
+          }
+        } else {
+          var skyP = (progress - 0.5) / 0.5;
+          this.gradBg(ctx, w, h, [
+            [0, 'hsl(215, ' + (55 - skyP * 15) + '%, ' + (25 - skyP * 10) + '%)'],
+            [1, 'hsl(210, ' + (50 - skyP * 20) + '%, ' + (45 - skyP * 20) + '%)']
+          ]);
+        }
+        /* /PHASE1 */
       }
 
-      // ロケット全体（斜め上）
+      // --- Step 3-5②: 加算合成 雲突破の白フラッシュ ---
+      var FLASH = { start: 0.45, end: 0.55, maxAlpha: 0.6 };
+      if (progress > FLASH.start && progress < FLASH.end) {
+        var flashAlpha = 1 - Math.abs(progress - 0.5) / 0.05;
+        flashAlpha = Math.min(flashAlpha, FLASH.maxAlpha);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = 'rgba(255, 255, 255, ' + Math.max(0, flashAlpha) + ')';
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      // --- ロケット（共通: 画像/フォールバック両方で使う） ---
       SVG.drawRocket(ctx, w * 0.48, h * 0.35, 3.5, 0.08);
       SVG.drawExhaustFlare(ctx, w * 0.48, h * 0.35 + 3.5 * 56, 2.5, 0.7);
 
-      // 雲がパース的に収束
+      // --- 雲パーティクル（共通） ---
       var cx = w * 0.5, cy = h * 1.1;
       var cloudDensity = progress < 0.5 ? (1 - progress * 1.8) : 0;
 
@@ -784,7 +946,7 @@
         ctx.restore();
       }
 
-      // 速度線（収束点に向かう）
+      // --- 速度線（共通） ---
       var speedFade = progress < 0.5 ? 1 : Math.max(0, 1 - (progress - 0.5) / 0.3);
       if (speedFade > 0) {
         ctx.save();
@@ -805,27 +967,53 @@
       }
 
       FX.waterDroplets(ctx, w, h, cloudDensity * 0.8);
+
+      // --- Step 3-4: ズームrestore ---
+      ctx.restore();
     },
 
-    // ====== Scene 6: 空が青→藍→黒 (188-217) ======
+    // ====== Scene 6: 空が青→藍→黒 (128-157) ======
     scene6: function(ctx, w, h, progress, speed) {
-      var t = performance.now();
+      // --- Phase 2: 9:16縦長画像の縦スクロール描画 ---
+      var gradImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene6-gradient') : null;
 
-      var hue = 215 + progress * 15;
-      var sat = 40 - progress * 30;
-      var light = 15 - progress * 13;
+      if (gradImg) {
+        // canvas幅にフィットさせた場合のスケールと表示高さを算出
+        var scale = w / gradImg.width;
+        var scaledHeight = gradImg.height * scale;
+        var viewportHeight = h;
+        var scrollRange = scaledHeight - viewportHeight;
 
-      this.gradBg(ctx, w, h, [
-        [0, 'hsl(' + hue + ', ' + Math.max(5, sat) + '%, ' + Math.max(2, light) + '%)'],
-        [1, 'hsl(' + (hue + 5) + ', ' + Math.max(5, sat - 10) + '%, ' + Math.max(3, light + 5) + '%)']
-      ]);
+        if (scrollRange > 0) {
+          // progress=0 → 画像の下端を表示、progress=1 → 上端を表示
+          var offsetY = scrollRange * (1 - progress);
+          // drawImageのソース領域: offsetYをスケール逆算
+          var sy = offsetY / scale;
+          var sh = viewportHeight / scale;
+          ctx.drawImage(gradImg, 0, sy, gradImg.width, sh, 0, 0, w, h);
+        } else {
+          // 画像がcanvasより短い場合はそのまま引き伸ばし
+          ctx.drawImage(gradImg, 0, 0, w, h);
+        }
+      } else {
+        /* PHASE1: プログラマティック背景（フォールバック） */
+        var hue = 215 + progress * 15;
+        var sat = 40 - progress * 30;
+        var light = 15 - progress * 13;
 
-      // 星（後半から出現）
+        this.gradBg(ctx, w, h, [
+          [0, 'hsl(' + hue + ', ' + Math.max(5, sat) + '%, ' + Math.max(2, light) + '%)'],
+          [1, 'hsl(' + (hue + 5) + ', ' + Math.max(5, sat - 10) + '%, ' + Math.max(3, light + 5) + '%)']
+        ]);
+        /* /PHASE1 */
+      }
+
+      // --- 星（共通: 後半から出現） ---
       if (progress > 0.3) {
         this.stars(ctx, w, h, (progress - 0.3) / 0.7 * 0.6);
       }
 
-      // ロケット全体
+      // --- ロケット（共通） ---
       SVG.drawRocket(ctx, w * 0.48, h * 0.35, 3.5, 0.08);
 
       // 噴射
@@ -834,84 +1022,123 @@
         SVG.drawExhaustFlare(ctx, w * 0.48, h * 0.35 + 3.5 * 56, 2, exhaustI);
       }
 
-      // 宇宙移行
+      // 宇宙移行エフェクト
       if (speed > 0.3 && progress < 0.5) {
         FX.starStreaks(ctx, w, h, speed * 0.2);
       }
     },
 
-    // ====== Scene 7: 宇宙・地球の曲率 (218-242) ======
+    // ====== Scene 7: 宇宙・地球の曲率 (158-182) ======
     scene7: function(ctx, w, h, progress, speed) {
       var t = performance.now();
 
-      ctx.fillStyle = CONFIG.colors.spaceBlack;
-      ctx.fillRect(0, 0, w, h);
+      // --- Phase 2: drawImage()ベースの背景 ---
+      var earthImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene7-earth') : null;
+      // 実画像（HTMLImageElement）は地球の曲率・大気グローを含む想定
+      var useImageBg = earthImg && (earthImg.tagName === 'IMG');
 
-      this.stars(ctx, w, h, 0.5 + progress * 0.3);
+      if (earthImg) {
+        ctx.drawImage(earthImg, 0, 0, w, h);
+      }
+      if (!earthImg) {
+        /* PHASE1: プログラマティック背景（フォールバック） */
+        ctx.fillStyle = CONFIG.colors.spaceBlack;
+        ctx.fillRect(0, 0, w, h);
 
-      // 地球の曲率
-      var curveY = h * 0.75 - progress * h * 0.05;
-      var curveR = w * 2.5;
+        // 地球の曲率
+        var curveY = h * 0.75 - progress * h * 0.05;
+        var curveR = w * 2.5;
 
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(w * 0.5, curveY + curveR, curveR, -Math.PI * 0.15, -Math.PI * 0.85, true);
-      ctx.lineTo(0, h); ctx.lineTo(w, h); ctx.closePath();
-      ctx.clip();
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(w * 0.5, curveY + curveR, curveR, -Math.PI * 0.15, -Math.PI * 0.85, true);
+        ctx.lineTo(0, h); ctx.lineTo(w, h); ctx.closePath();
+        ctx.clip();
 
-      ctx.fillStyle = '#0a3060';
-      ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#0a3060';
+        ctx.fillRect(0, 0, w, h);
 
-      // 陸地
-      ctx.fillStyle = '#1a5a2a';
-      ctx.beginPath();
-      ctx.ellipse(w * 0.3, curveY + 30, w * 0.2, 40, 0.2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(w * 0.65, curveY + 50, w * 0.15, 30, -0.1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#2a6a3a';
-      ctx.beginPath(); ctx.ellipse(w * 0.5, curveY + 20, 25, 12, 0.3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(w * 0.8, curveY + 35, 15, 8, 0, 0, Math.PI * 2); ctx.fill();
+        // 陸地
+        ctx.fillStyle = '#1a5a2a';
+        ctx.beginPath();
+        ctx.ellipse(w * 0.3, curveY + 30, w * 0.2, 40, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(w * 0.65, curveY + 50, w * 0.15, 30, -0.1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#2a6a3a';
+        ctx.beginPath(); ctx.ellipse(w * 0.5, curveY + 20, 25, 12, 0.3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.8, curveY + 35, 15, 8, 0, 0, Math.PI * 2); ctx.fill();
 
-      // 雲
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
-      ctx.beginPath(); ctx.ellipse(w * 0.4, curveY + 15, w * 0.3, 8, 0.05, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(w * 0.7, curveY + 40, w * 0.2, 6, -0.1, 0, Math.PI * 2); ctx.fill();
+        // 雲
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.beginPath(); ctx.ellipse(w * 0.4, curveY + 15, w * 0.3, 8, 0.05, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.7, curveY + 40, w * 0.2, 6, -0.1, 0, Math.PI * 2); ctx.fill();
 
-      ctx.restore();
+        ctx.restore();
 
-      // 大気グロー
-      ctx.save();
-      ctx.strokeStyle = 'rgba(100,180,255,' + (0.3 + progress * 0.3) + ')';
-      ctx.lineWidth = 3 + progress * 5;
-      ctx.shadowColor = 'rgba(100,180,255,0.4)';
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(w * 0.5, curveY + curveR, curveR, -Math.PI * 0.13, -Math.PI * 0.87, true);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-      ctx.restore();
+        // 大気グロー
+        ctx.save();
+        ctx.strokeStyle = 'rgba(100,180,255,' + (0.3 + progress * 0.3) + ')';
+        ctx.lineWidth = 3 + progress * 5;
+        ctx.shadowColor = 'rgba(100,180,255,0.4)';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(w * 0.5, curveY + curveR, curveR, -Math.PI * 0.13, -Math.PI * 0.87, true);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+        /* /PHASE1 */
+      }
 
-      // ロケット
+      // --- 星（実画像モードではスキップ — 画像に含まれている） ---
+      if (!useImageBg) {
+        this.stars(ctx, w, h, 0.5 + progress * 0.3);
+      }
+
+      // --- ロケット（共通） ---
       var rs = 2.0 - progress * 0.8;
       SVG.drawRocket(ctx, w * 0.5, h * 0.35, rs);
       SVG.drawExhaustFlare(ctx, w * 0.5, h * 0.35 + rs * 56, rs * 0.5, 0.3 - progress * 0.15);
     },
 
-    // ====== Scene 8: 衛星軌道投入・デプロイ (243-256) ======
+    // ====== Scene 8: 衛星軌道投入・デプロイ (183-196) ======
     scene8: function(ctx, w, h, progress, speed) {
       var t = performance.now();
 
-      ctx.fillStyle = CONFIG.colors.spaceBlack;
-      ctx.fillRect(0, 0, w, h);
+      // --- Step 3-1: イージング（最初速く→ゆっくり止まる） ---
+      progress = Ease.outCubic(progress);
 
-      this.stars(ctx, w, h, 0.85);
+      // --- Phase 2: drawImage()ベースの背景 ---
+      var satImg = (typeof ImagePreloader !== 'undefined') ? ImagePreloader.get('scene8-satellite') : null;
+      // satImgが実画像（HTMLImageElement）の場合は地球・星も含まれている想定
+      // プレースホルダー（HTMLCanvasElement）の場合はSVG地球を描画
+      var useImageBg = satImg && (satImg.tagName === 'IMG');
 
-      // 地球
+      if (useImageBg) {
+        // 実画像: 地球・星を含む完成背景
+        ctx.drawImage(satImg, 0, 0, w, h);
+      } else if (satImg) {
+        // プレースホルダー: 背景のみ描画、地球・星はSVGで重ねる
+        ctx.drawImage(satImg, 0, 0, w, h);
+      } else {
+        /* PHASE1: プログラマティック背景（フォールバック） */
+        ctx.fillStyle = CONFIG.colors.spaceBlack;
+        ctx.fillRect(0, 0, w, h);
+        /* /PHASE1 */
+      }
+
+      // --- 星（実画像モードではスキップ — 画像に含まれている） ---
+      if (!useImageBg) {
+        this.stars(ctx, w, h, 0.85);
+      }
+
+      // --- 地球（実画像モードではスキップ — 画像に含まれている） ---
       var earthR = Math.min(w, h) * 0.45;
       var earthY = h * 0.85;
-      SVG.drawEarth(ctx, w * 0.5, earthY, earthR);
+      if (!useImageBg) {
+        SVG.drawEarth(ctx, w * 0.5, earthY, earthR);
+      }
 
       if (progress < 0.4) {
         // フェーズA: ロケットが軌道に乗る
@@ -968,6 +1195,14 @@
         ctx.restore();
 
         SVG.drawSatellite(ctx, satOX, satOY, 1.2 + Math.sin(t * 0.002) * 0.05);
+
+        // --- Step 3-5③: 加算合成 ソーラーパネル反射 ---
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.beginPath();
+        ctx.arc(satOX, satOY, 8, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 240, ' + (0.3 + Math.sin(t * 0.005) * 0.2) + ')';
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
 
         // ロケット上段（消えていく光点）
         var rocketFade = 1 - pC;
@@ -1192,7 +1427,16 @@
     var progress = getSceneProgress(frame, scene);
     var w = state.canvasW, h = state.canvasH;
 
-    ctx.clearRect(0, 0, w, h);
+    // --- Step 3-3: 残像（scene4=idx2, scene6=idx4で半透明クリア） ---
+    var AFTERIMAGE_ALPHA = 0.15; // 残像の強さ（低いほど長く残る）
+    if (sceneIdx === 2 || sceneIdx === 4) {
+      ctx.globalAlpha = AFTERIMAGE_ALPHA;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 1.0;
+    } else {
+      ctx.clearRect(0, 0, w, h);
+    }
 
     // シーン番号は元のdemoと同じ（scene2〜scene8）
     var sceneFunc = 'scene' + (sceneIdx + 2);
@@ -1233,6 +1477,7 @@
   // ======= APP INIT =======
   function init() {
     var loadingBar = document.getElementById('loading-bar');
+    var loadingText = document.getElementById('loading-text');
     var loading = document.getElementById('loading');
     var scrollHint = document.getElementById('scroll-hint');
     var skipBtn = document.getElementById('skip-btn');
@@ -1245,13 +1490,32 @@
       return;
     }
 
-    // ローディングアニメーション
-    var loadProgress = 0;
-    var loadInterval = setInterval(function() {
-      loadProgress += Math.random() * 15 + 5;
-      if (loadProgress >= 100) {
-        loadProgress = 100;
-        clearInterval(loadInterval);
+    // ======= Phase 2: 画像プリローダー連動 =======
+    // ImagePreloaderが利用可能なら実際の読み込み進捗を表示
+    // 利用不可なら従来の偽プログレスにフォールバック
+    if (typeof ImagePreloader !== 'undefined') {
+      if (loadingText) loadingText.textContent = 'LOADING ASSETS';
+
+      ImagePreloader.loadAll(function(loaded, total) {
+        // 進捗バーを実際の読み込み状況に連動
+        var percent = Math.round((loaded / total) * 100);
+        if (loadingBar) loadingBar.style.width = percent + '%';
+        if (loadingText) {
+          loadingText.textContent = 'LOADING ASSETS ' + loaded + '/' + total;
+        }
+      }).then(function(result) {
+        // 読み込み完了 → ローディング画面をフェードアウト
+        if (loadingBar) loadingBar.style.width = '100%';
+        if (loadingText) loadingText.textContent = 'READY';
+
+        // デバッグ情報をコンソールに出力
+        console.log('[ImagePreloader] 読み込み完了:', result.stats);
+        result.results.forEach(function(r) {
+          if (r.source === 'placeholder') {
+            console.log('[ImagePreloader] プレースホルダー使用: ' + r.key);
+          }
+        });
+
         setTimeout(function() {
           if (loading) loading.style.opacity = '0';
           setTimeout(function() {
@@ -1261,9 +1525,28 @@
             state.initialized = true;
           }, 600);
         }, 300);
-      }
-      if (loadingBar) loadingBar.style.width = loadProgress + '%';
-    }, 100);
+      });
+    } else {
+      // フォールバック: 従来の偽プログレスバー
+      var loadProgress = 0;
+      var loadInterval = setInterval(function() {
+        loadProgress += Math.random() * 15 + 5;
+        if (loadProgress >= 100) {
+          loadProgress = 100;
+          clearInterval(loadInterval);
+          setTimeout(function() {
+            if (loading) loading.style.opacity = '0';
+            setTimeout(function() {
+              if (loading) loading.style.display = 'none';
+              if (scrollHint) scrollHint.style.display = 'block';
+              if (skipBtn) skipBtn.style.display = 'block';
+              state.initialized = true;
+            }, 600);
+          }, 300);
+        }
+        if (loadingBar) loadingBar.style.width = loadProgress + '%';
+      }, 100);
+    }
 
     // スキップボタン: アニメーションをスキップしてサイトへ
     if (skipBtn) {

@@ -1,3 +1,31 @@
+# Environment variables
+.env
+.env.*
+.env.local
+.env.production
+!.env.example
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Keys and credentials
+*.pem
+*.key
+*.p12
+
+# Dependencies
 node_modules/
+
+# Vercel
 .vercel
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log

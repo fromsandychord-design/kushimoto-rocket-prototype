@@ -1,5 +1,11 @@
 # CLAUDE.md — kushimoto-rocket-prototype
 
+## シークレット運用（Phase 2: 1Password CLI + direnv）
+
+シークレット管理は **`~/.claude/CLAUDE.md` の「シークレット運用ルール（Phase 2）」セクション** に従う。
+vault: `morethansix-secrets` / 注入機構: `op inject` + direnv / `.env.local` 直書き禁止。
+矛盾があればグローバル CLAUDE.md が優先。
+
 ## セキュリティルール（全実装で必ず守ること）
 
 > 背景: 2026-04-15 全プロジェクト横断セキュリティ監査で検出された問題の再発防止。
